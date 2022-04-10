@@ -1,0 +1,23 @@
+﻿  Vector.cpp
+C:\Users\Стёпа\source\repos\Vector\Vector\MyVector.h(57,1): error C2440: =: невозможно преобразовать "const _Elem *" в "size_t"
+          with
+          [
+              _Elem=int
+          ]
+C:\Users\Стёпа\source\repos\Vector\Vector\MyVector.h(57,15): message : Не существует контекста, в котором такое преобразование возможно
+C:\Users\Стёпа\source\repos\Vector\Vector\MyVector.h(55): message : во время компиляции функции-члена класс шаблон "MyVector<int>::MyVector(std::initializer_list<T>)"
+          with
+          [
+              T=int
+          ]
+C:\Users\Стёпа\source\repos\Vector\Vector\Vector.cpp(6): message : выполняется компиляция ссылки на экземпляр шаблон функции "MyVector<int>::MyVector(std::initializer_list<T>)"
+          with
+          [
+              T=int
+          ]
+C:\Users\Стёпа\source\repos\Vector\Vector\Vector.cpp(6): message : выполняется компиляция ссылки на экземпляр класс шаблон функции "MyVector<int>"
+C:\Users\Стёпа\source\repos\Vector\Vector\MyVector.h(61,17): error C2676: бинарный "[": "std::initializer_list<T>" не определяет этот оператор или преобразование к типу приемлемо к встроенному оператору
+          with
+          [
+              T=int
+          ]
