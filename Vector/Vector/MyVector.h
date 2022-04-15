@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include <math.h>
 
 template<class T>
 class MyVector
@@ -23,6 +24,7 @@ private:
 public:
 	MyVector(std::initializer_list<T> l);
 	MyVector(T* array,size_t size);
+	MyVector(const MyVector<T>& myvector);
 	MyVector();
 
 	~MyVector();
@@ -31,11 +33,19 @@ public:
 
 	size_t size();
 
-	T& operator[](size_t i)
-	{
-		assert(i < _size);
-		return _array[i];
-	}
+	T& operator[](const size_t i)const;
+	
+	MyVector<T> operator+(const MyVector<T> myvector)const;
+
+	MyVector<T> operator-(const MyVector<T> myvector)const;
+
+	MyVector<T> operator*(const MyVector<T> myvector)const;
+
+	MyVector<T> operator*(const int num)const;
+
+	MyVector<T> operator/(const MyVector<T> myvector)const;
+
+	double len();
 
 };
 
@@ -54,9 +64,9 @@ inline std::istream& operator>>(std::istream& is, MyVector<T>& myVector)
 }
 
 template<class T>
-inline std::ostream& operator<<(std::ostream& os, MyVector<T>& myvector)
+inline std::ostream& operator<<(std::ostream& os,const MyVector<T>& myvector) 
 {
-	for (size_t i = 0; i < myvector.size(); i++)
+	for (size_t i = 0; i < myvector._real; i++)
 	{
 		os << myvector[i] << " ";
 	}
@@ -66,17 +76,17 @@ inline std::ostream& operator<<(std::ostream& os, MyVector<T>& myvector)
 template<class T>
 inline void MyVector<T>::MemoryAdd()
 {
-	if (_size == 0) _size = 1;
+	//if (_size == 0) _size = 1;
 	
-	T* array = new T[_size];
+	T* array = new T[_real];
 
-	for (size_t i = 0; i < _size;i++) array[i] = _array[i];
+	for (size_t i = 0; i < _real;i++) array[i] = _array[i];
 
 	_size *= 2;
 
 	_array = new T[_size];
 
-	for (size_t i = 0; i < _size/2;i++) _array[i] = array[i];
+	for (size_t i = 0; i < _real;i++) _array[i] = array[i];
 	//_array = (T*)realloc(_array, _size * sizeof(T));
 }
 
@@ -111,19 +121,37 @@ inline MyVector<T>::MyVector(T* array, size_t size)
 	{
 		_array[i] = array[i];
 	}
+
+}
+
+template<class T>
+inline MyVector<T>::MyVector(const MyVector<T>& myvector)
+{
+	_size = myvector._size;
+	_real = myvector._real;
+	_array = new T[_size];
+
+	for (size_t i = 0; i < _real; i++) 
+	{
+		_array[i] = myvector[i];
+	}
+
+	
+
 }
 
 template<class T>
 inline MyVector<T>::MyVector()
 {
-	_size = _real = 0;
+	_size = 1;
+	_real = 0;
 
-	_array = new T[0];
+	_array = new T[_size];
 
 }
 
 template<class T>
-inline void MyVector<T>::Add(T object)
+inline void MyVector<T>::Add(const T  object)
 {
 	if (_size == _real) 
 	{
@@ -136,9 +164,115 @@ inline void MyVector<T>::Add(T object)
 }
 
 template<class T>
-inline size_t MyVector<T>::size()
+inline size_t MyVector<T>::size() //const
 {
 	return _real;
+}
+
+template<class T>
+inline T& MyVector<T>::operator[](const size_t i) const
+{
+	assert(i < _size);
+	return _array[i];
+}
+
+template<class T>
+inline MyVector<T> MyVector<T>::operator+(const MyVector<T> myvector) const
+{
+	assert(!(_real != myvector._real));
+
+	MyVector<T> plus;
+
+	for (size_t i = 0; i < _real; i += 1)
+	{
+		T elem = _array[i] + myvector[i];
+		plus.Add(elem);
+
+	}
+
+	return plus;
+
+}
+
+template<class T>
+inline MyVector<T> MyVector<T>::operator-(const MyVector<T> myvector) const
+{
+	assert(!(_real != myvector._real));
+
+	MyVector<T> plus;
+
+	for (size_t i = 0; i < _real; i += 1)
+	{
+		T elem = _array[i] - myvector[i];
+		plus.Add(elem);
+
+	}
+
+	return plus;
+}
+
+template<class T>
+inline MyVector<T> MyVector<T>::operator*(const MyVector<T> myvector) const
+{
+	assert(!(_real != myvector._real));
+
+	MyVector<T> plus;
+
+	for (size_t i = 0; i < _real; i += 1)
+	{
+		T elem = _array[i] * myvector[i];
+		plus.Add(elem);
+
+	}
+
+	return plus;
+}
+
+template<class T>
+inline MyVector<T> MyVector<T>::operator*(const int num) const
+{
+	MyVector<T> plus;
+
+	for (size_t i = 0; i < _real; i += 1)
+	{
+		T elem = _array[i]*num;
+		plus.Add(elem);
+
+	}
+
+	return plus;
+}
+
+template<class T>
+inline MyVector<T> MyVector<T>::operator/(const MyVector<T> myvector) const
+{
+	assert(!(_real != myvector._real));
+
+	MyVector<T> plus;
+
+	for (size_t i = 0; i < _real; i += 1)
+	{
+		T elem = _array[i] / myvector[i];
+		plus.Add(elem);
+
+	}
+
+	return plus;
+}
+
+template<class T>
+inline double MyVector<T>::len()
+{
+	double back=0;
+
+	for (int i = 0; i < _real; i++) 
+	{
+		back += _array[i] * _array[i];
+	}
+
+	back = sqrt(back);
+
+	return back;
 }
 
 
