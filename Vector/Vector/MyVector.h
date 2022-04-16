@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <math.h>
 
+# define TRUE_PI 3.14159265358979323846 
+
 template<class T>
 class MyVector
 {
@@ -19,12 +21,13 @@ private:
 	template<class T>
 	friend std::istream& operator>> (std::istream& is,  MyVector<T>& myVector);
 
-	
+	double sum();
 
 public:
 	MyVector(std::initializer_list<T> l);
 	MyVector(T* array,size_t size);
 	MyVector(const MyVector<T>& myvector);
+	MyVector(T elem);
 	MyVector();
 
 	~MyVector();
@@ -34,19 +37,24 @@ public:
 	size_t size();
 
 	T& operator[](const size_t i)const;
+
+	MyVector<T>& operator=(const MyVector<T> &myVector);
 	
-	MyVector<T> operator+(const MyVector<T> myvector)const;
+	MyVector<T> operator+(const MyVector<T> &myvector)const;
 
-	MyVector<T> operator-(const MyVector<T> myvector)const;
+	MyVector<T> operator-(const MyVector<T> &myvector)const;
 
-	MyVector<T> operator*(const MyVector<T> myvector)const;
+	MyVector<T> operator*(const MyVector<T> &myvector)const;
 
 	MyVector<T> operator*(const int num)const;
 
-	MyVector<T> operator/(const MyVector<T> myvector)const;
+	MyVector<T> operator/(const MyVector<T> &myvector)const;
+
+	double scal(MyVector<T> &myVector);
 
 	double len();
 
+	double angle(MyVector<T> &myvector);
 };
 
 template<class T>
@@ -97,6 +105,19 @@ inline MyVector<T>::~MyVector()
 }
 
 template<class T>
+inline double MyVector<T>::sum()
+{
+	double d = 0;
+
+	for (size_t i = 0; i < _real; i++)
+	{
+		d += _array[i];
+	}
+
+	return d;
+}
+
+template<class T>
 inline MyVector<T>::MyVector(std::initializer_list<T> l)
 {
 	_size = l.size();
@@ -141,6 +162,16 @@ inline MyVector<T>::MyVector(const MyVector<T>& myvector)
 }
 
 template<class T>
+inline MyVector<T>::MyVector(T elem)
+{
+	_real = 0;
+	_size = 1;
+	_array = new T[_size];
+
+	Add(elem);
+}
+
+template<class T>
 inline MyVector<T>::MyVector()
 {
 	_size = 1;
@@ -177,7 +208,22 @@ inline T& MyVector<T>::operator[](const size_t i) const
 }
 
 template<class T>
-inline MyVector<T> MyVector<T>::operator+(const MyVector<T> myvector) const
+inline MyVector<T>& MyVector<T>::operator=(const MyVector<T> &myVector)
+{
+	_size = myVector._size;
+	_real = myVector._real;
+	_array = new T[_size];
+
+	for (size_t i = 0; i < _real; i++) 
+	{
+		_array[i] = myVector._array[i];
+	}
+
+	return *this;
+}
+
+template<class T>
+inline MyVector<T> MyVector<T>::operator+(const MyVector<T> &myvector) const
 {
 	assert(!(_real != myvector._real));
 
@@ -195,7 +241,7 @@ inline MyVector<T> MyVector<T>::operator+(const MyVector<T> myvector) const
 }
 
 template<class T>
-inline MyVector<T> MyVector<T>::operator-(const MyVector<T> myvector) const
+inline MyVector<T> MyVector<T>::operator-(const MyVector<T> &myvector) const
 {
 	assert(!(_real != myvector._real));
 
@@ -212,13 +258,18 @@ inline MyVector<T> MyVector<T>::operator-(const MyVector<T> myvector) const
 }
 
 template<class T>
-inline MyVector<T> MyVector<T>::operator*(const MyVector<T> myvector) const
+inline MyVector<T> MyVector<T>::operator*(const MyVector<T> &myvector) const
 {
-	assert(!(_real != myvector._real));
+	size_t size = _real;
+	if (_real != myvector._real) 
+	{
+		size = std::min(_real, myvector._real);
+		std::cout << "Size Vector A != Size Vector B, min size = " << size << " will be used!";
+	}
 
 	MyVector<T> plus;
 
-	for (size_t i = 0; i < _real; i += 1)
+	for (size_t i = 0; i < size; i += 1)
 	{
 		T elem = _array[i] * myvector[i];
 		plus.Add(elem);
@@ -244,7 +295,7 @@ inline MyVector<T> MyVector<T>::operator*(const int num) const
 }
 
 template<class T>
-inline MyVector<T> MyVector<T>::operator/(const MyVector<T> myvector) const
+inline MyVector<T> MyVector<T>::operator/(const MyVector<T> &myvector) const
 {
 	assert(!(_real != myvector._real));
 
@@ -258,6 +309,12 @@ inline MyVector<T> MyVector<T>::operator/(const MyVector<T> myvector) const
 	}
 
 	return plus;
+}
+
+template<class T>
+inline double MyVector<T>::scal(MyVector<T> &myVector)
+{
+	return (myVector * (*this)).sum();
 }
 
 template<class T>
@@ -275,4 +332,18 @@ inline double MyVector<T>::len()
 	return back;
 }
 
+template<class T>
+inline double MyVector<T>::angle(MyVector<T> &myVector)
+{
+	double myscal,a, b, cos,ans;
 
+
+	myscal = scal(myVector);
+	a = this->len();
+	b = myVector.len();
+	cos = myscal /(a*b);
+	
+	ans = acos(cos) * 180.0 / TRUE_PI;
+
+	return ans;
+}
